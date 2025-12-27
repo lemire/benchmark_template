@@ -9,7 +9,7 @@ include(cmake/CPM.cmake)
 include_directories(benchmarks src include)
 
 add_executable(benchmark benchmarks/benchmark.cpp)
-CPMAddPackage("gh:lemire/counters#v1.0.1")
+CPMAddPackage("gh:lemire/counters#v2.2.0")
 target_link_libraries(benchmark PRIVATE counters)
 if(NOT CMAKE_BUILD_TYPE)
     set(CMAKE_BUILD_TYPE Release CACHE STRING "Build type" FORCE)
