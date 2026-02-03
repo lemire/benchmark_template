@@ -1,38 +1,34 @@
 #include <algorithm>
 #include <chrono>
+#include <cstdint>
+#include <format>
 #include <iostream>
+#include <print>
 #include <random>
 #include <string>
 #include <vector>
-#include <format>
-#include <print>
-#include <cstdint>
 
 #include "benchmarker.h"
 #include "counters/event_counter.h"
 
-
-
 double pretty_print(const std::string &name, size_t num_values,
-                    std::pair<event_aggregate, size_t> result) {
+                    std::pair<counters::event_aggregate, size_t> result) {
   const auto &agg = result.first;
   size_t N = result.second;
   num_values *= N; // Adjust num_values to account for repetitions
   std::print("{:<50} : ", name);
-  std::print(" {:5.3f} ns ",
-             agg.fastest_elapsed_ns() / double(num_values));
-  std::print(" {:5.2f} Gv/s ",
-             double(num_values) / agg.fastest_elapsed_ns());
+  std::print(" {:5.3f} ns ", agg.fastest_elapsed_ns() / double(num_values));
+  std::print(" {:5.2f} Gv/s ", double(num_values) / agg.fastest_elapsed_ns());
   if (collector.has_events()) {
-  std::print(" {:5.2f} GHz ", agg.cycles() / double(agg.elapsed_ns()));
-  std::print(" {:5.2f} c ", agg.fastest_cycles() / double(num_values));
-  std::print(" {:5.2f} i ", agg.fastest_instructions() / double(num_values));
-  std::print(" {:5.2f} i/c ", agg.fastest_instructions() / double(agg.fastest_cycles()));
+    std::print(" {:5.2f} GHz ", agg.cycles() / double(agg.elapsed_ns()));
+    std::print(" {:5.2f} c ", agg.fastest_cycles() / double(num_values));
+    std::print(" {:5.2f} i ", agg.fastest_instructions() / double(num_values));
+    std::print(" {:5.2f} i/c ",
+               agg.fastest_instructions() / double(agg.fastest_cycles()));
   }
   std::print("\n");
   return double(num_values) / agg.fastest_elapsed_ns();
 }
-
 
 void collect_benchmark_results(size_t input_size, size_t number_strings) {
   // Generate many strings of varying content, including leading/trailing spaces
@@ -60,11 +56,8 @@ void collect_benchmark_results(size_t input_size, size_t number_strings) {
     }
     counter += c;
   };
-  auto classic_result = pretty_print("trim_classic", number_strings, bench(count_classic));
-
+  auto classic_result =
+      pretty_print("trim_classic", number_strings, bench(count_classic));
 }
 
-
-int main(int argc, char **argv) {
-  collect_benchmark_results(1024, 100000);
-}
+int main(int argc, char **argv) { collect_benchmark_results(1024, 100000); }
