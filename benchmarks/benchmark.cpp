@@ -8,18 +8,14 @@
 #include <string>
 #include <vector>
 
-#include "benchmarker.h"
-#include "counters/event_counter.h"
+#include "counters/bench.h"
 
 double pretty_print(const std::string &name, size_t num_values,
-                    std::pair<counters::event_aggregate, size_t> result) {
-  const auto &agg = result.first;
-  size_t N = result.second;
-  num_values *= N; // Adjust num_values to account for repetitions
+                    counters::event_aggregate agg) {
   std::print("{:<50} : ", name);
   std::print(" {:5.3f} ns ", agg.fastest_elapsed_ns() / double(num_values));
   std::print(" {:5.2f} Gv/s ", double(num_values) / agg.fastest_elapsed_ns());
-  if (collector.has_events()) {
+  if (counters::has_performance_counters()) {
     std::print(" {:5.2f} GHz ", agg.cycles() / double(agg.elapsed_ns()));
     std::print(" {:5.2f} c ", agg.fastest_cycles() / double(num_values));
     std::print(" {:5.2f} i ", agg.fastest_instructions() / double(num_values));
@@ -56,8 +52,7 @@ void collect_benchmark_results(size_t input_size, size_t number_strings) {
     }
     counter += c;
   };
-  auto classic_result =
-      pretty_print("trim_classic", number_strings, bench(count_classic));
+  pretty_print("trim_classic", number_strings, counters::bench(count_classic));
 }
 
 int main(int argc, char **argv) { collect_benchmark_results(1024, 100000); }
